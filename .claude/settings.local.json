@@ -1,5 +1,14 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__context7__resolve-library-id",
+      "Bash(npm install *)",
+      "Bash(npm run *)"
+    ]
+  },
   "enabledMcpjsonServers": [
-    "github"
+    "github",
+    "context7",
+    "playwright"
   ]
 }

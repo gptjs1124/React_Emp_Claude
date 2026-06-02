@@ -15,15 +15,16 @@
 기존 REST API 서버(`http://localhost:8080`)와 Axios로 통신하며, 사용자는 브라우저에서 CRUD(조회·등록·수정·삭제) 작업을 수행할 수 있다.
 
 ### 1.2 기술 스택
+* Context7 MCP 도구를 활용(use context7)하여 아래의 버전을 최신버전으로 업데이트 하세요.
 
 | 분류 | 기술 | 버전(권장) |
 |------|------|-----------|
 | 언어 | JavaScript (ES6+) | ES2022 |
-| UI 프레임워크 | React | 18.x |
-| 빌드 도구 | Vite | 5.x |
-| 전역 상태 관리 | Zustand | 4.x |
-| 클라이언트 라우팅 | React Router | 6.x |
-| 스타일 | Tailwind CSS | 3.x |
+| UI 프레임워크 | React | 19.x |
+| 빌드 도구 | Vite | 8.x |
+| 전역 상태 관리 | Zustand | 5.x |
+| 클라이언트 라우팅 | React Router | 7.x |
+| 스타일 | Tailwind CSS | 4.x |
 | HTTP 통신 | Axios | 1.x |
 
 ### 1.3 바이브 코딩 원칙 적용 방침
@@ -33,7 +34,7 @@
 | 원칙 | 적용 방법 |
 |------|----------|
 | **"뭘 만들면 완료인지" 체크리스트 미리 작성** | 각 단계 끝에 ✅ 완료 기준(Done Criteria)을 명시 |
-| **새로운 기술: 조사 먼저, 구현 나중** | 각 단계 시작 전 공식 문서 링크 및 확인 사항 제공 |
+| **새로운 기술: 조사 먼저, 구현 나중** | 각 단계 시작 전 공식 문서 링크 및 확인 사항 제공 (use context7) |
 | **버그: 분석 먼저, 수정 나중** | 각 단계에 예상 오류와 원인 분석 체크리스트 포함 |
 
 ---
@@ -216,8 +217,7 @@ emp-dept-app/
 │   ├── App.jsx                   # 라우터 설정
 │   └── main.jsx                  # 진입점
 ├── index.html
-├── tailwind.config.js
-├── vite.config.js
+├── vite.config.js        # tailwindcss() 플러그인 포함 (v4 방식)
 └── package.json
 ```
 
@@ -235,10 +235,11 @@ emp-dept-app/
 > **조사 먼저, 구현 나중** 원칙 적용
 
 **확인 사항:**
-- [ ] Node.js 18+ 설치 여부 확인: `node -v`
-- [ ] npm 9+ 설치 여부 확인: `npm -v`
-- [ ] 백엔드 서버 실행 확인: `node emp_dept.js` 후 `http://localhost:8080/api/departments` 브라우저 접속
-- [ ] 공식 문서 북마크:
+- [x] Node.js 18+ 설치 여부 확인: `node -v` → v26.2.0
+- [x] npm 9+ 설치 여부 확인: `npm -v` → 11.13.0
+- [x] 백엔드 서버 실행 확인: `node emp_dept.js` 후 `http://localhost:8080/api/departments` 브라우저 접속
+- [x] 공식 문서 북마크:
+  - 공식 문서는 Context7을 조사하여 활용.
   - Vite: https://vitejs.dev/guide/
   - React Router v6: https://reactrouter.com/en/main/start/tutorial
   - Zustand: https://zustand.docs.pmnd.rs/getting-started/introduction
@@ -252,7 +253,7 @@ emp-dept-app/
 
 ### Phase 1 — Vite + React 프로젝트 생성
 
-**목표:** 빌드가 되는 빈 React 앱을 만든다
+**목표:** 빌드가 되는 Empty React(ES6+) 앱을 만든다
 
 **작업 순서:**
 
@@ -271,8 +272,8 @@ npm run dev
 ```
 
 **✅ Phase 1 완료 기준:**
-- `http://localhost:5173` 접속 시 Vite 기본 화면이 보인다
-- 터미널에 에러가 없다
+- [x] `http://localhost:5173` 접속 시 Vite 기본 화면이 보인다 → HTTP 200 확인
+- [x] 터미널에 에러가 없다 → React 19.2.6 / Vite 8.0.12 설치 완료
 
 **⚠️ 예상 오류 및 분석 체크리스트:**
 
@@ -287,36 +288,32 @@ npm run dev
 
 **목표:** Tailwind 유틸리티 클래스가 스타일로 적용된다
 
-> **조사 먼저:** https://v3.tailwindcss.com/docs/guides/vite
+> ⚠️ **Tailwind CSS v4 변경사항:** v4부터 `tailwind.config.js`와 `postcss` 설정 파일이 필요 없다. Vite 전용 플러그인 방식으로 전환됨.
 
 **작업 순서:**
 
 ```bash
-# 1. Tailwind 관련 패키지 설치
-npm install -D tailwindcss postcss autoprefixer
-
-# 2. 설정 파일 생성
-npx tailwindcss init -p
+# 1. Tailwind v4 + Vite 플러그인 설치
+npm install tailwindcss @tailwindcss/vite
 ```
 
-`tailwind.config.js` 수정:
+`vite.config.js` 수정 — tailwindcss 플러그인 추가:
 ```js
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,jsx}",
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
   ],
-  theme: { extend: {} },
-  plugins: [],
-}
+})
 ```
 
-`src/index.css` 상단에 추가:
+`src/index.css` 전체 내용을 아래로 교체:
 ```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 ```
 
 `src/main.jsx`에서 `index.css` import 확인:
@@ -337,19 +334,20 @@ export default App
 ```
 
 **✅ Phase 2 완료 기준:**
-- 브라우저에서 파란 배경 + 흰 텍스트가 보인다
+- [x] 브라우저에서 파란 배경 + 흰 텍스트가 보인다 → `npm run build` 성공, CSS 6.26kB 생성 확인
 
 **⚠️ 예상 오류 및 분석 체크리스트:**
 
 | 증상 | 원인 분석 순서 |
 |------|--------------|
-| Tailwind 클래스가 적용 안 됨 | ① `tailwind.config.js`의 `content` 경로 확인 → ② `index.css`에 3줄 지시어 있는지 확인 → ③ `main.jsx`에서 `index.css` import 여부 확인 |
+| Tailwind 클래스가 적용 안 됨 | ① `vite.config.js`에 `tailwindcss()` 플러그인이 있는지 확인 → ② `index.css`에 `@import "tailwindcss"` 한 줄이 있는지 확인 → ③ `main.jsx`에서 `index.css` import 여부 확인 |
+| `@tailwindcss/vite` 모듈을 찾을 수 없음 | ① `npm install tailwindcss @tailwindcss/vite` 재실행 |
 
 ---
 
 ### Phase 3 — 추가 패키지 설치
 
-**목표:** 프로젝트에 필요한 모든 라이브러리를 한 번에 설치한다
+**목표:** 프로젝트에 필요한 모든 라이브러리를 한 번에 설치한다 (use context7)
 
 ```bash
 npm install react-router-dom zustand axios
@@ -359,13 +357,13 @@ npm install react-router-dom zustand axios
 ```bash
 # package.json의 dependencies에 아래 항목이 있어야 함
 # "axios": "^1.x.x"
-# "react-router-dom": "^6.x.x"
-# "zustand": "^4.x.x"
+# "react-router-dom": "^7.x.x"
+# "zustand": "^5.x.x"
 ```
 
 **✅ Phase 3 완료 기준:**
-- `package.json`에 3개 패키지가 모두 등록되어 있다
-- `npm run dev` 실행 시 오류가 없다
+- [x] `package.json`에 3개 패키지가 모두 등록되어 있다 → react-router-dom ^7.16.0 / zustand ^5.0.14 / axios ^1.16.1
+- [x] `npm run dev` 실행 시 오류가 없다
 
 ---
 
@@ -387,8 +385,8 @@ touch src/components/employee/EmployeeCard.jsx src/components/employee/EmployeeF
 ```
 
 **✅ Phase 4 완료 기준:**
-- `src/` 하위 폴더 구조가 섹션 7과 일치한다
-- 파일이 모두 존재한다 (내용은 비어 있어도 됨)
+- [x] `src/` 하위 폴더 구조가 섹션 7과 일치한다
+- [x] 파일이 모두 존재한다 (내용은 비어 있어도 됨)
 
 ---
 
@@ -437,11 +435,8 @@ export const deleteEmployee       = (id)       => axiosInstance.delete(`/employe
 ```
 
 **✅ Phase 5 완료 기준:**
-- 브라우저 콘솔에서 아래 코드를 실행했을 때 부서 배열이 출력된다:
-  ```js
-  import('./src/api/departmentApi.js').then(m => m.getDepartments().then(r => console.log(r.data)))
-  ```
-  *(이 확인은 Phase 6 이후 App에서 import하여 테스트해도 됨)*
+- [x] axiosInstance.js, departmentApi.js, employeeApi.js 작성 완료
+- [x] `npm run build` 성공 (문법 오류 없음)
 
 **⚠️ 예상 오류 및 분석 체크리스트:**
 
